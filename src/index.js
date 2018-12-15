@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {createStore} from 'redux'
+import {createStore,applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
 import './index.css';
 import App from './App';
@@ -18,7 +18,21 @@ switch(action.type){
     return state
 }
 }
-const store= createStore(reducer)
+function logger({ getState }) {
+    return next => action => {
+      console.log('will dispatch', action)
+  
+      // Call the next dispatch method in the middleware chain.
+      next(action)
+  
+      console.log('state after dispatch', getState())
+  
+      // This will likely be the action itself, unless
+      // a middleware further in chain changed it.
+      return true
+    }
+  }
+const store= createStore(reducer,{count:0},applyMiddleware(logger))
 console.log(store.getState())
 
 
